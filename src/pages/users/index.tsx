@@ -17,35 +17,15 @@ import {
 	Spinner
 } from "@chakra-ui/react";
 import { RiAddLine } from "react-icons/ri";
-import { useQuery } from 'react-query'; // utilizado para fazer as requisições p/ API
 
-import { api } from '../../services/api';
+import { useUsers } from '../../services/hooks/useUsers';
 
 import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 import { SideBar } from "../../components/SideBar";
 
 export default function UserList() {
-	const { data, isLoading, isFetching, error } = useQuery('users', async () => {
-		const { data } = await api.get('users');
-
-		const users = data.users.map(({ id, name, email, createdAt }) => {
-			return {
-				id,
-				name,
-				email,
-				createdAt: new Date(createdAt).toLocaleDateString('pt-br', {
-					day: '2-digit',
-					month: 'long',
-					year: 'numeric'
-				})
-			}
-		});
-
-		return users
-	}, {
-		staleTime: 1000 * 5, // 5 seconds
-	});
+	const { data, isLoading, isFetching, error } = useUsers();
 
 	const isWideVersion = useBreakpointValue({
 		base: false,

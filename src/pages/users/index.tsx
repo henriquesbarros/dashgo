@@ -13,26 +13,43 @@ import {
   Tbody, 
   Td, 
   Text,
-	useBreakpointValue 
+	useBreakpointValue, 
+	Spinner
 } from "@chakra-ui/react";
 import { RiAddLine } from "react-icons/ri";
+import { useQuery } from 'react-query'; // utilizado para fazer as requisições p/ API
 
 import { Header } from "../../components/Header";
 import { Pagination } from "../../components/Pagination";
 import { SideBar } from "../../components/SideBar";
-import { useEffect } from "react";
 
 export default function UserList() {
+	const { data, isLoading, error } = useQuery('users', async () => {
+		const response = await fetch('http://localhost:3000/api/users')
+		const data = await response.json();
+
+		const users = data.users.map(({ id, name, email, createdAt }) => {
+			return {
+				id,
+				name,
+				email,
+				createdAt: new Date(createdAt).toLocaleDateString('pt-br', {
+					day: '2-digit',
+					month: 'long',
+					year: 'numeric'
+				})
+			}
+		});
+
+		return users
+	}, {
+		staleTime: 1000 * 5, // 5 seconds
+	});
+
 	const isWideVersion = useBreakpointValue({
 		base: false,
 		lg: true
 	});
-
-	useEffect(() => {
-		fetch('http://localhost:3000/api/users')
-			.then(response => response.json())
-				.then(data => console.log(data))
-	}, [])
 
 	return (
 		<Box>
@@ -57,34 +74,50 @@ export default function UserList() {
 						</Link>
 					</Flex>
 
-					<Table colorScheme="whiteAlpha">
-						<Thead>
-							<Tr>
-								<Th px={["4", "4", "6"]} color="gray.300" width="8">
-									<Checkbox colorScheme="pink" />
-								</Th>
-								<Th>Usuário</Th>
-								{ isWideVersion && <Th>Data de cadastro</Th> }
-							</Tr>
-						</Thead>
+					{ isLoading ? (
+						<Flex justify="center">
+							<Spinner />
+						</Flex>
+					) : error ? (
+						<Flex justify="center">
+							<Text>Falha ao obter dados dos usuários.</Text>
+						</Flex>
+					) : (
+						<>
+							<Table colorScheme="whiteAlpha">
+								<Thead>
+									<Tr>
+										<Th px={["4", "4", "6"]} color="gray.300" width="8">
+											<Checkbox colorScheme="pink" />
+										</Th>
+										<Th>Usuário</Th>
+										{ isWideVersion && <Th>Data de cadastro</Th> }
+									</Tr>
+								</Thead>
 
-						<Tbody>
-							<Tr>
-								<Td px={["4", "4", "6"]}>
-									<Checkbox colorScheme="pink" />
-								</Td>
-								<Td>
-									<Box>
-										<Text fontWeight="bold">Henrique Barros</Text>
-										<Text fontSize="sm" color="gray.300">henriquesbarroshs@gmail.com</Text>
-									</Box>
-								</Td>
-								{ isWideVersion && <Td>19 de março de 2021</Td> }
-							</Tr>
-						</Tbody>
-					</Table>
+								<Tbody>
+									{data.map(({ id, name, email, createdAt }) => {
+										return (
+											<Tr key={id}>
+												<Td px={["4", "4", "6"]}>
+													<Checkbox colorScheme="pink" />
+												</Td>
+												<Td>
+													<Box>
+														<Text fontWeight="bold">{name}</Text>
+														<Text fontSize="sm" color="gray.300">{email}</Text>
+													</Box>
+												</Td>
+												{ isWideVersion && <Td>{createdAt}</Td> }
+											</Tr>
+										);
+									})}
+								</Tbody>
+							</Table>
 
-					<Pagination />
+							<Pagination />
+						</>
+					)}
 				</Box>
 			</Flex>
 		</Box>

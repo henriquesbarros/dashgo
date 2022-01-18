@@ -8,7 +8,7 @@
 
 <br />
 
-# Dependêncidas 
+# Dependências 
 
 * [ReactJS](https://pt-br.reactjs.org/docs/getting-started.html)
 * [NextJS](https://nextjs.org/docs/getting-started)
@@ -17,7 +17,7 @@
 * [Yup](https://github.com/jquense/yup)
 * [Apexcharts](https://apexcharts.com/docs/installation/)
 
-# Dependêncidas de desenvolvimento
+# Dependências de desenvolvimento
 
 * [Typescript](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes.html)
 * [FakerJS](https://www.testim.io/blog/getting-started-with-faker-js/)
